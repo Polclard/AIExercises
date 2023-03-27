@@ -14,8 +14,9 @@ if __name__ == '__main__':
     problem.addConstraint(SomeInSetConstraint([1]), ("Marija_prisustvo","Petar_prisustvo"))
     # problem.addConstraint(InSetConstraint([13,14,16,19]), ("vreme_sostanok",))
 
-    problem.addConstraint(lambda m,p,v: (p == 0 and m == 1 and v in [14]) or (m == 0 and p == 1 and v in [13,16,19]), ( "Marija_prisustvo", "Petar_prisustvo", "vreme_sostanok")) 
-    
+    problem.addConstraint(lambda m,p,v: (p == 0 and m == 1 and v in [14]) or (m == 0 and p == 1 and v in [13,16,19]), ( "Marija_prisustvo", "Petar_prisustvo", "vreme_sostanok"))
+
+
     prb = problem.getSolutions()
     
     nov = dict()
