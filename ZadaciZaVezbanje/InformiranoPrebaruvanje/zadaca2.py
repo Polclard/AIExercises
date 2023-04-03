@@ -551,8 +551,8 @@ class GhostOnSkates(Problem):
         return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
     def h(self, node):
-        # return self.manhattanDistance(node.state[0], node.state[1], self.goal[0], self.goal[1])
-        return self.euclideanDistance(node.state[0], node.state[1], self.goal[0], self.goal[1])
+        return self.manhattanDistance(node.state[0], node.state[1], self.goal[0], self.goal[1])/3
+        # return self.euclideanDistance(node.state[0], node.state[1], self.goal[0], self.goal[1])
         # return self.chebyshevDistance(node.state[0], node.state[1], self.goal[0], self.goal[1])
 if __name__ == '__main__':
     '''
