@@ -54,7 +54,7 @@ if __name__ == '__main__':
     domain = [f'T{i + 1}' for i in range(num)]
 
     problem = Problem(BacktrackingSolver())
-
+    print(papers)
     # Dokolku vi e potrebno moze da go promenite delot za dodavanje na promenlivite
     problem.addVariables(("AI","ML","NLP"), domain)
 

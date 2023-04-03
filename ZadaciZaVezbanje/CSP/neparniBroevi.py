@@ -14,7 +14,7 @@ if __name__ == '__main__':
     problem.addConstraint(lambda b1, b2, b3, b4: b1 < b2 < b3 < b4, variables)
     problem.addConstraint(lambda d: d % 2 != 0, ('D',))
 
-    solutions = problem.getSolutions();
+    solutions = problem.getSolutions()
 
     new_dict = dict()
 
