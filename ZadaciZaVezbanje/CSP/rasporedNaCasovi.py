@@ -1,5 +1,39 @@
 from constraint import *
 
+lista_zafateni = []
+
+
+def someFunc(var1, var2, var3, var4, var5, var6, var7):
+    lista = [var1, var2, var3, var4, var5, var6, var7]
+    # print([item for item in lista])
+    if var1.split("_")[0] != var2.split("_")[0] != var3.split("_")[0] != var4.split("_")[0] != var5.split("_")[0] != \
+            var6.split("_")[0] != var7.split("_")[0]:
+        return True
+
+    counterTrue = 0
+    counterFalse = 0
+
+    for i in range(0, len(lista)):
+        for j in range(i + 1, len(lista)):
+            # print(f'{int(lista[i].split("_")[1])}')
+            if (lista[i] not in lista_zafateni or lista[j] not in lista_zafateni) and lista[i].split("_")[0] == \
+                    lista[j].split("_")[0] and abs(int(lista[i].split("_")[1]) - int(lista[j].split("_")[1])) >= 2:
+                lista_zafateni.append(lista[j])
+                return True
+            else:
+                pass
+
+    # print(lista_zafateni)
+    #
+    # for var in lista:
+    #     if var not in lista_zafateni:
+    #         ...
+    #     else:
+    #         return False
+
+    return False
+
+
 if __name__ == '__main__':
     problem = Problem(BacktrackingSolver())
     casovi_AI = input()
@@ -19,8 +53,42 @@ if __name__ == '__main__':
 
     # ---Tuka dodadete gi promenlivite--------------------
 
+    lista_predavanja_ai = []
+    lista_predavanja_ml = []
+    lista_predavanja_r = []
+    lista_predavanja_bi = []
+
+    for i in range(int(casovi_AI)):
+        lista_predavanja_ai.append("AI_cas_" + str(i + 1))
+
+    for i in range(int(casovi_ML)):
+        lista_predavanja_ml.append("ML_cas_" + str(i + 1))
+
+    for i in range(int(casovi_R)):
+        lista_predavanja_r.append("R_cas_" + str(i + 1))
+
+    for i in range(int(casovi_BI)):
+        lista_predavanja_bi.append("BI_cas_" + str(i + 1))
+
+    # print(lista_predavanja_ai)
+
+    problem.addVariables(lista_predavanja_ai, AI_vezbi_domain)
+    problem.addVariables(lista_predavanja_ml, ML_predavanja_domain)
+    problem.addVariables(lista_predavanja_r, R_predavanja_domain)
+    problem.addVariables(lista_predavanja_bi, BI_vezbi_domain)
+
+    problem.addVariable(("AI_vezbi"), AI_vezbi_domain)
+    problem.addVariable(("ML_vezbi"), ML_vezbi_domain)
+    problem.addVariable(("BI_vezbi"), BI_vezbi_domain)
+
     # ---Tuka dodadete gi ogranichuvanjata----------------
+
+    problem.addConstraint(someFunc, )
+
+    # problem.addConstraint()
+
     # ----------------------------------------------------
+
     solution = problem.getSolution()
 
     print(solution)
