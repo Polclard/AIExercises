@@ -17,23 +17,16 @@ def check_diagonal(x, y, n1):
 def func(*args):
     print(args)
 
-    counter = 0
-    for main in args:
-        counter = 0
-        for other in args:
-            if other != main:
-                x_main = main[0]
-                y_main = main[1]
+    listOfGood= []
 
-                x_other = other[0]
-                y_other = other[1]
-                if x_main == x_other or y_main == y_other and other in check_diagonal(x_main, y_main, N_GLOBAL):
-                    counter += 1
+    for i in range(1, len(args)):
+        for j in range(i+1, len(args)):
+            if i != j:
+                if (args[i] == args[j]) or (args[i][0] == args[j][0]) or (args[i][1] == args[j][1]) or (args[j] in check_diagonal(args[i][0], args[i][1], N_GLOBAL)):
+                    return False
+        listOfGood.append(tuple(args))
+    return True
 
-        if counter >= len(args) * len(args) - 2:
-            return False
-        else:
-            return True
 
 
 N_GLOBAL = 0
