@@ -29,6 +29,7 @@ def someFunc(var1, var2, var3, var4, var5, var6, var7):
     return True
 
 
+
 if __name__ == '__main__':
     problem = Problem(BacktrackingSolver())
     casovi_AI = input()
@@ -49,6 +50,7 @@ if __name__ == '__main__':
     BI_vezbi_domain = ["Tue_10", "Tue_11", "Thu_10", "Thu_11"]
 
     # ---Tuka dodadete gi promenlivite--------------------
+
     list_ai = ["AI_cas_" + str(i + 1) for i in range(int(casovi_AI))]
     list_ml = ["ML_cas_" + str(i + 1) for i in range(int(casovi_ML))]
     list_r = ["R_cas_" + str(i + 1) for i in range(int(casovi_R))]
@@ -64,26 +66,19 @@ if __name__ == '__main__':
     problem.addVariable("BI_vezbi", BI_vezbi_domain)
 
     # ---Tuka dodadete gi ogranichuvanjata----------------
-
-    # problem.addConstraint(AllDifferentConstraint(), )
-    problem.addConstraint(someFunc, )
-
-
-
     # ----------------------------------------------------
+
+    # print(list_ml)
+    # problem.addVariable("ML_cas_1", ML_predavanja_domain)
+    # problem.addConstraint(masinsko, ("ML_vezbi", "ML_cas_1"))
+    # problem.addConstraint(AllDifferentConstraint(),)
+    problem.addConstraint(nova, )
+
 
     solution = problem.getSolution()
 
-    #{'ML_vezbi': 'Thu_14', 'ML_cas_1': 'Fri_15', 'BI_vezbi': 'Thu_11', 'AI_vezbi': 'Tue_13', 'AI_cas_1': 'Fri_12', 'BI_cas_1': 'Fri_10', 'R_cas_1': 'Wed_15'}
-
-    new_dictionary = dict()
-
-    for element in solution:
-        new_dictionary['ML_vezbi'] = solution['ML_vezbi']
-        new_dictionary['AI'] = solution['ML_vezbi']
-        new_dictionary['ML_vezbi'] = solution['ML_vezbi']
-
     print(solution)
 
+    nov = dict ()
 
-
+    # for x in solution:
