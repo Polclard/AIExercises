@@ -624,7 +624,6 @@ if __name__ == "__main__":
     direction = input()
 
     number_of_dots = int(input())
-    dots_locations = []
 
     obstacles = ((0, 9), (1, 9), (2, 9), (3, 9),
                  (6, 9), (0, 8), (8, 8), (9, 8),

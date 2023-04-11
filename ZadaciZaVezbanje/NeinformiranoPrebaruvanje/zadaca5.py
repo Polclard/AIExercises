@@ -491,27 +491,29 @@ class hanoiProblem(Problem):
         start[2] = list(state[2])
 
 
-        # for i in range(len(state)):
-        #     for j in range(len(state)):
-        #         successors['MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 2'] = self.move(i, j, start)
+        for i in range(len(state)):
+            for j in range(len(state)):
+                start = list(state)
+                start[0] = list(state[0])
+                start[1] = list(state[1])
+                start[2] = list(state[2])
+                # MOVE TOP BLOCK FROM PILLAR 0 TO PILLAR 1
+                successors['MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 2'] = self.move(i, j, start)
 
-        # # MOVE TOP BLOCK FROM PILLAR 0 TO PILLAR 1
-        successors['MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 2'] = self.move(0, 1, start)
+                # MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 0
+                successors['MOVE TOP BLOCK FROM PILLAR 2 TO PILLAR 1'] = self.move(i, j, start)
 
-        # MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 0
-        successors['MOVE TOP BLOCK FROM PILLAR 2 TO PILLAR 1'] = self.move(1, 0, start)
+                # MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 2
+                successors['MOVE TOP BLOCK FROM PILLAR 2 TO PILLAR 3'] = self.move(i, j, start)
 
-        # MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 2
-        successors['MOVE TOP BLOCK FROM PILLAR 2 TO PILLAR 3'] = self.move(1, 2, start)
+                # MOVE TOP BLOCK FROM PILLAR 2 TO PILLAR 1
+                successors['MOVE TOP BLOCK FROM PILLAR 3 TO PILLAR 2'] = self.move(i, j, start)
 
-        # MOVE TOP BLOCK FROM PILLAR 2 TO PILLAR 1
-        successors['MOVE TOP BLOCK FROM PILLAR 3 TO PILLAR 2'] = self.move(2, 1, start)
+                # MOVE TOP BLOCK FROM PILLAR 0 TO PILLAR 2
+                successors['MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 3'] = self.move(i, j, start)
 
-        # MOVE TOP BLOCK FROM PILLAR 0 TO PILLAR 2
-        successors['MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 3'] = self.move(0, 2, start)
-
-        # MOVE TOP BLOCK FROM PILLAR 2 TO PILLAR 0
-        successors['MOVE TOP BLOCK FROM PILLAR 3 TO PILLAR 1'] = self.move(2, 0, start)
+                # MOVE TOP BLOCK FROM PILLAR 2 TO PILLAR 0
+                successors['MOVE TOP BLOCK FROM PILLAR 3 TO PILLAR 1'] = self.move(i, j, start)
 
         return successors
 

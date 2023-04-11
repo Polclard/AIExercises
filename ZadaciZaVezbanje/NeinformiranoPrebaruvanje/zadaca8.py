@@ -319,7 +319,7 @@ def tree_search(problem, fringe):
     fringe.append(Node(problem.initial))
     while fringe:
         node = fringe.pop()
-        print(node.state)
+        # print(node.state)
         if problem.goal_test(node.state):
             return node
         fringe.extend(node.expand(problem))
@@ -451,8 +451,6 @@ def uniform_cost_search(problem):
     return graph_search(problem, PriorityQueue(min, lambda a: a.path_cost))
 
 
-
-
 class Boenje(Problem):
     def __init__(self, initial, n, goal=None):
         super().__init__(initial, goal)
@@ -460,13 +458,33 @@ class Boenje(Problem):
 
     def click(self):
         pass
+
     def successor(self, state):
         successors = dict()
 
         start = state
+        N = self.n
 
+        # 1 - Black
+        # 0 - White
+        for i in range(0, N):
+            for j in range(0, N):
+                new_state = list([list(item) for item in state])
+                new_state[i][j] = 1 if new_state[i][j] == 0 else 0
+                if i + 1 <= N - 1:
+                    new_state[i + 1][j] = 1 if new_state[i + 1][j] == 0 else 0
+                if i - 1 >= 0:
+                    new_state[i - 1][j] = 1 if new_state[i - 1][j] == 0 else 0
+                if j + 1 <= N - 1:
+                    new_state[i][j + 1] = 1 if new_state[i][j + 1] == 0 else 0
+                if j - 1 >= 0:
+                    new_state[i][j - 1] = 1 if new_state[i][j - 1] == 0 else 0
+                # for i1 in range(N):
+                #     for j1 in range(N):
+                #         print(new_state[i1][j1], end=" ")
+                #     print("")
+                successors[f"x: {i}, y: {j}"] = tuple((tuple(item) for item in new_state))
 
-        print(start)
         return successors
 
     def goal_test(self, state):
@@ -487,15 +505,24 @@ if __name__ == "__main__":
     matrix = []
     counter = 0
 
+    goal_state = []
+
     for i in range(N):
         row = []
+        row2 = []
         for j in range(N):
             row.append(list_of_fields[counter])
+            row2.append(1)
             counter += 1
         matrix.append(tuple(row))
+        goal_state.append(tuple(row2))
 
-    problem = Boenje(tuple(matrix), N, tuple([1 for i in range(N*N)]))
+    problem = Boenje(tuple(matrix), N, tuple(goal_state))
+
+    # print(tuple(goal_state))
+
+    # print(f"{tuple(matrix)} {tuple(goal_state)}")
 
     solution = breadth_first_graph_search(problem)
 
-    print(solution)
+    print(solution.solution())

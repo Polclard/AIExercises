@@ -476,38 +476,31 @@ class Disk(Problem):
     def successor(self, state):
         successors = dict()
 
-
-        '''
-            D1: Disk i - за преместување на дискот i надесно во соседно празно поле, i = 1, 2, ..., N
-            D2: Disk i - за преместување на дискот i преку едно поле надесно, i = 1, 2, ..., N
-            L1: Disk i - за преместување на дискот i налево во соседно празно поле, i = 1, 2, ..., N
-            L2: Disk i - за преместување на дискот i преку едно поле налево, i = 1, 2, ..., N
-        '''
         for i in range(0, len(state)):
-            starting_state = copy.deepcopy(list(state))
-            # desno so prazno
-            if i != len(starting_state)-1 and starting_state[i] != 0 and starting_state[i + 1] == 0:
+            starting_state = list(state)
+            # desno so prazno D1
+            if i < len(starting_state)-1 and starting_state[i] != 0 and starting_state[i + 1] == 0:
                 temp = starting_state[i]
                 starting_state[i] = starting_state[i + 1]
                 starting_state[i + 1] = temp
                 successors["D1: Disk " + str(temp)] = tuple(starting_state)
 
-            # levo so prazno
-            elif starting_state[i] != 0 and i - 1 >= 0 and starting_state[i - 1] == 0:
-                temp = starting_state[i]
-                starting_state[i] = starting_state[i - 1]
-                starting_state[i - 1] = temp
-                successors["L1: Disk " + str(temp)] = tuple(starting_state)
-
-            # desno so polno
-            elif i != len(starting_state)-1 and  i != len(starting_state)-2 and starting_state[i] != 0 and starting_state[i + 1] != 0 and starting_state[i + 2] == 0:
+            # desno so polno D2
+            if i < len(starting_state) - 2 and starting_state[i] != 0 and starting_state[i + 1] != 0 and starting_state[i + 2] == 0:
                 temp = starting_state[i]
                 starting_state[i] = starting_state[i + 2]
                 starting_state[i + 2] = temp
                 successors["D2: Disk " + str(temp)] = tuple(starting_state)
 
-            # levo so polno
-            elif starting_state[i] != 0 and i - 2 >= 0 and starting_state[i - 1] != 0 and starting_state[i - 2] == 0:
+            # levo so prazno L1
+            if starting_state[i] != 0 and i - 1 >= 0 and starting_state[i - 1] == 0:
+                temp = starting_state[i]
+                starting_state[i] = starting_state[i - 1]
+                starting_state[i - 1] = temp
+                successors["L1: Disk " + str(temp)] = tuple(starting_state)
+
+            # levo so polno L2
+            if starting_state[i] != 0 and i - 2 >= 0 and starting_state[i - 1] != 0 and starting_state[i - 2] == 0:
                 temp = starting_state[i]
                 starting_state[i] = starting_state[i - 2]
                 starting_state[i - 2] = temp
@@ -553,5 +546,7 @@ if __name__ == "__main__":
 
     solution = breadth_first_graph_search(problem)
 
+    # print(solution.solve())
     print(solution.solution())
+
 
