@@ -459,8 +459,34 @@ class Squares(Problem):
     def __init__(self, initial, goal):
         super().__init__(initial, goal)
 
-    def h(self, node):
-        raise NotImplementedError
+    def chebyshevDistance(self, x1, y1, x2, y2):
+        return max(abs(y1 - y2), abs(x1 - x2))
 
+    def euclideanDistance(self, x1, y1, x2, y2):
+        return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+    def manhattanDistance(self, x1, y1, x2, y2):
+        return abs(y1 - y2) + abs(x1 - x2)
+
+    # def h(self, node):
+    #     """
+    #     Хевристичка функција која враќа број на квадратчиња кои не се на своите целни позиции на левата дијагонала.
+    #     """
+    #     goal_state = ((0, 0), (1, 1), (2, 2), (3, 3), (4, 4))  # Целна состојба на таблата
+    #     misplaced_count = 0  # Број на квадратчиња кои не се на своите целни позиции
+
+    #     for i in range(len(node.state)):
+    #         if node.state[i] != goal_state[i]:
+    #             misplaced_count += 1
+
+    #     return misplaced_count
+
+    def h(self, node):
+        total = 0
+
+        for i in range(len(node.state)):
+            total += self.manhattanDistance(node.state[i][0], node.state[i][1], self.goal[i][0], self.goal[i][1])
+
+        return total
 
 # NE PISHUVAJTE MAIN DEL

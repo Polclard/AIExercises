@@ -1,6 +1,10 @@
 import bisect
-import copy
-import sys
+
+"""
+Дефинирање на класа за структурата на проблемот кој ќе го решаваме со пребарување.
+Класата Problem е апстрактна класа од која правиме наследување за дефинирање на основните 
+карактеристики на секој проблем што сакаме да го решиме
+"""
 
 
 class Problem:
@@ -308,276 +312,232 @@ class PriorityQueue(Queue):
                 self.data.pop(i)
 
 
-def tree_search(problem, fringe):
-    """ Пребарувај низ следбениците на даден проблем за да најдеш цел.
-    :param problem: даден проблем
-    :type problem: Problem
-    :param fringe:  празна редица (queue)
-    :type fringe: FIFOQueue or Stack or PriorityQueue
-    :return: Node or None
-    :rtype: Node
-    """
-    fringe.append(Node(problem.initial))
-    while fringe:
-        node = fringe.pop()
-        # print(node.state)
-        if problem.goal_test(node.state):
-            return node
-        fringe.extend(node.expand(problem))
-    return None
-
-
-def breadth_first_tree_search(problem):
-    """Експандирај го прво најплиткиот јазол во пребарувачкото дрво.
-    :param problem: даден проблем
-    :type problem: Problem
-    :return: Node or None
-    :rtype: Node
-    """
-    return tree_search(problem, FIFOQueue())
-
-
-def depth_first_tree_search(problem):
-    """Експандирај го прво најдлабокиот јазол во пребарувачкото дрво.
-    :param problem: даден проблем
-    :type problem: Problem
-    :return: Node or None
-    :rtype: Node
-    """
-    return tree_search(problem, Stack())
-
+from sys import maxsize as infinity
 
 """
-Неинформирано пребарување во рамки на граф
-Основната разлика е во тоа што овде не дозволуваме јамки, 
-т.е. повторување на состојби
+Информирано пребарување во рамки на граф
 """
 
 
-def graph_search(problem, fringe):
-    """Пребарувај низ следбениците на даден проблем за да најдеш цел.
-     Ако до дадена состојба стигнат два пата, употреби го најдобриот пат.
+def memoize(fn, slot=None):
+    """ Запамети ја пресметаната вредност за која била листа од
+    аргументи. Ако е специфициран slot, зачувај го резултатот во
+    тој slot на првиот аргумент. Ако slot е None, зачувај ги
+    резултатите во речник.
+    :param fn: зададена функција
+    :type fn: function
+    :param slot: име на атрибут во кој се чуваат резултатите од функцијата
+    :type slot: str
+    :return: функција со модификација за зачувување на резултатите
+    :rtype: function
+    """
+    if slot:
+        def memoized_fn(obj, *args):
+            if hasattr(obj, slot):
+                return getattr(obj, slot)
+            else:
+                val = fn(obj, *args)
+                setattr(obj, slot, val)
+                return val
+    else:
+        def memoized_fn(*args):
+            if args not in memoized_fn.cache:
+                memoized_fn.cache[args] = fn(*args)
+            return memoized_fn.cache[args]
+
+        memoized_fn.cache = {}
+    return memoized_fn
+
+
+def best_first_graph_search(problem, f):
+    """Пребарувај низ следбениците на даден проблем за да најдеш цел. Користи
+     функција за евалуација за да се одлучи кој е сосед најмногу ветува и
+     потоа да се истражи. Ако до дадена состојба стигнат два пата, употреби
+     го најдобриот пат.
     :param problem: даден проблем
     :type problem: Problem
-    :param fringe:  празна редица (queue)
-    :type fringe: FIFOQueue or Stack or PriorityQueue
+    :param f: дадена функција за евалуација (проценка)
+    :type f: function
     :return: Node or None
     :rtype: Node
     """
-    closed = set()
-    fringe.append(Node(problem.initial))
-    while fringe:
-        node = fringe.pop()
+    f = memoize(f, 'f')
+    node = Node(problem.initial)
+    if problem.goal_test(node.state):
+        return node
+    frontier = PriorityQueue(min, f)
+    frontier.append(node)
+    explored = set()
+    while frontier:
+        node = frontier.pop()
         if problem.goal_test(node.state):
             return node
-        if node.state not in closed:
-            closed.add(node.state)
-            fringe.extend(node.expand(problem))
+        explored.add(node.state)
+        for child in node.expand(problem):
+            if child.state not in explored and child not in frontier:
+                frontier.append(child)
+            elif child in frontier:
+                incumbent = frontier[child]
+                if f(child) < f(incumbent):
+                    del frontier[incumbent]
+                    frontier.append(child)
     return None
 
 
-def breadth_first_graph_search(problem):
-    """Експандирај го прво најплиткиот јазол во пребарувачкиот граф.
+def greedy_best_first_graph_search(problem, h=None):
+    """ Greedy best-first пребарување се остварува ако се специфицира дека f(n) = h(n).
     :param problem: даден проблем
     :type problem: Problem
+    :param h: дадена функција за хевристика
+    :type h: function
     :return: Node or None
-    :rtype: Node
     """
-    return graph_search(problem, FIFOQueue())
+    h = memoize(h or problem.h, 'h')
+    return best_first_graph_search(problem, h)
 
 
-def depth_first_graph_search(problem):
-    """Експандирај го прво најдлабокиот јазол во пребарувачкиот граф.
+def astar_search(problem, h=None):
+    """ A* пребарување е best-first graph пребарување каде f(n) = g(n) + h(n).
     :param problem: даден проблем
     :type problem: Problem
+    :param h: дадена функција за хевристика
+    :type h: function
     :return: Node or None
-    :rtype: Node
     """
-    return graph_search(problem, Stack())
+    h = memoize(h or problem.h, 'h')
+    return best_first_graph_search(problem, lambda n: n.path_cost + h(n))
 
 
-def depth_limited_search(problem, limit=50):
-    """Експандирај го прво најдлабокиот јазол во пребарувачкиот граф
-    со ограничена длабочина.
+def recursive_best_first_search(problem, h=None):
+    """Recursive best first search - ја ограничува рекурзијата
+    преку следење на f-вредноста на најдобриот алтернативен пат
+    од било кој јазел предок (еден чекор гледање нанапред).
     :param problem: даден проблем
     :type problem: Problem
-    :param limit: лимит за длабочината
-    :type limit: int
+    :param h: дадена функција за хевристика
+    :type h: function
     :return: Node or None
-    :rtype: Node
     """
+    h = memoize(h or problem.h, 'h')
 
-    def recursive_dls(node, problem, limit):
-        """Помошна функција за depth limited"""
-        cutoff_occurred = False
+    def RBFS(problem, node, flimit):
         if problem.goal_test(node.state):
-            return node
-        elif node.depth == limit:
-            return 'cutoff'
-        else:
-            for successor in node.expand(problem):
-                result = recursive_dls(successor, problem, limit)
-                if result == 'cutoff':
-                    cutoff_occurred = True
-                elif result is not None:
-                    return result
-        if cutoff_occurred:
-            return 'cutoff'
-        return None
+            return node, 0  # (втората вредност е неважна)
+        successors = node.expand(problem)
+        if len(successors) == 0:
+            return None, infinity
+        for s in successors:
+            s.f = max(s.path_cost + h(s), node.f)
+        while True:
+            # Подреди ги според најниската f вредност
+            successors.sort(key=lambda x: x.f)
+            best = successors[0]
+            if best.f > flimit:
+                return None, best.f
+            if len(successors) > 1:
+                alternative = successors[1].f
+            else:
+                alternative = infinity
+            result, best.f = RBFS(problem, best, min(flimit, alternative))
+            if result is not None:
+                return result, best.f
 
-    return recursive_dls(Node(problem.initial), problem, limit)
-
-
-def iterative_deepening_search(problem):
-    """Експандирај го прво најдлабокиот јазол во пребарувачкиот граф
-    со ограничена длабочина, со итеративно зголемување на длабочината.
-    :param problem: даден проблем
-    :type problem: Problem
-    :return: Node or None
-    :rtype: Node
-    """
-    for depth in range(sys.maxsize):
-        result = depth_limited_search(problem, depth)
-        if result != 'cutoff':
-            return result
+    node = Node(problem.initial)
+    node.f = h(node)
+    result, bestf = RBFS(problem, node, infinity)
+    return result
 
 
-def uniform_cost_search(problem):
-    """Експандирај го прво јазолот со најниска цена во пребарувачкиот граф.
-    :param problem: даден проблем
-    :type problem: Problem
-    :return: Node or None
-    :rtype: Node
-    """
-    return graph_search(problem, PriorityQueue(min, lambda a: a.path_cost))
-
-
-class hanoiProblem(Problem):
+class Disk(Problem):
     def __init__(self, initial, goal=None):
         super().__init__(initial, goal)
 
-    @staticmethod
-    def fallingOrder(theTuple):
-        for i in range(len(theTuple) - 1):
-            if theTuple[i] < theTuple[i + 1]:
-                return False
-        return True
-
-    def check_valid(self, state, from_which_tower, to_which_tower):
-        # print(state)
-        for tower in state:
-            if not self.fallingOrder(tower):
-                return False
-        return True
-
-    def move(self, from_tower, to_tower, the_state):
-        first_state = list()
-        first_state.append(copy.deepcopy((the_state[0])))
-        first_state.append(copy.deepcopy((the_state[1])))
-        first_state.append(copy.deepcopy((the_state[2])))
-        if len(the_state[from_tower]) > 0:
-            new_state = the_state
-            new_state[to_tower].append(new_state[from_tower].pop())
-            if self.check_valid(new_state, from_tower, to_tower) and new_state != first_state:
-                return tuple(tuple(x) for x in new_state)
-        return tuple(tuple(x) for x in first_state)
+    def goal_test(self, state):
+        # print(f"{state}    -     {self.goal}")
+        return state == self.goal
 
     def successor(self, state):
-        successors = {}
+        successors = dict()
 
-        start = list(state)
-        start[0] = list(state[0])
-        start[1] = list(state[1])
-        start[2] = list(state[2])
-        # MOVE TOP BLOCK FROM PILLAR 0 TO PILLAR 1
-        successors['MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 2'] = self.move(0, 1, start)
+        for i in range(0, len(state)):
+            starting_state = list(state)
+            # desno so prazno D1
+            if i < len(starting_state) - 1 and starting_state[i] != 0 and starting_state[i + 1] == 0:
+                temp = starting_state[i]
+                starting_state[i] = starting_state[i + 1]
+                starting_state[i + 1] = temp
+                successors["D1: Disk " + str(temp)] = tuple(starting_state)
 
-        # MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 0
-        successors['MOVE TOP BLOCK FROM PILLAR 2 TO PILLAR 1'] = self.move(1, 0, start)
+            # desno so polno D2
+            if i < len(starting_state) - 2 and starting_state[i] != 0 and starting_state[i + 1] != 0 and starting_state[
+                i + 2] == 0:
+                temp = starting_state[i]
+                starting_state[i] = starting_state[i + 2]
+                starting_state[i + 2] = temp
+                successors["D2: Disk " + str(temp)] = tuple(starting_state)
 
-        # MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 2
-        successors['MOVE TOP BLOCK FROM PILLAR 2 TO PILLAR 3'] = self.move(1, 2, start)
+            # levo so prazno L1
+            if starting_state[i] != 0 and i - 1 >= 0 and starting_state[i - 1] == 0:
+                temp = starting_state[i]
+                starting_state[i] = starting_state[i - 1]
+                starting_state[i - 1] = temp
+                successors["L1: Disk " + str(temp)] = tuple(starting_state)
 
-        # MOVE TOP BLOCK FROM PILLAR 2 TO PILLAR 1
-        successors['MOVE TOP BLOCK FROM PILLAR 3 TO PILLAR 2'] = self.move(2, 1, start)
-
-        # MOVE TOP BLOCK FROM PILLAR 0 TO PILLAR 2
-        successors['MOVE TOP BLOCK FROM PILLAR 1 TO PILLAR 3'] = self.move(0, 2, start)
-
-        # MOVE TOP BLOCK FROM PILLAR 2 TO PILLAR 0
-        successors['MOVE TOP BLOCK FROM PILLAR 3 TO PILLAR 1'] = self.move(2, 0, start)
+            # levo so polno L2
+            if starting_state[i] != 0 and i - 2 >= 0 and starting_state[i - 1] != 0 and starting_state[i - 2] == 0:
+                temp = starting_state[i]
+                starting_state[i] = starting_state[i - 2]
+                starting_state[i - 2] = temp
+                successors["L2: Disk " + str(temp)] = tuple(starting_state)
 
         return successors
 
     def actions(self, state):
         return self.successor(state).keys()
 
-    def result(self, state, action):
-        m = self.successor(state)
-        return m[action]
+    def h(self, node):
+        counter = 0
 
-    def goal_test(self, state):
-        print(state, end = "  ")
-        print(self.goal)
-        return state == self.goal
+        for i in range(len(node.state)):
+            if node.state[i] != self.goal[i] and node.state[i] != 0:
+                counter += 1
+
+        return counter
+
+    def result(self, state, action):
+        return self.successor(state)[action]
 
 
 if __name__ == "__main__":
+    '''
+        D1: Disk i - за преместување на дискот i надесно во соседно празно поле, i = 1, 2, ..., N
+        D2: Disk i - за преместување на дискот i преку едно поле надесно, i = 1, 2, ..., N
+        L1: Disk i - за преместување на дискот i налево во соседно празно поле, i = 1, 2, ..., N
+        L2: Disk i - за преместување на дискот i преку едно поле налево, i = 1, 2, ..., N
+    '''
 
-    starting_state_input = input()
+    N = int(input())
+    L = int(input())
 
-    starting_state = starting_state_input.split(";")
+    list_starting_position = []
 
-    first_starting_state = starting_state[0].split(',')
-    second_starting_state = starting_state[1].split(',')
-    third_starting_state = starting_state[2].split(',')
+    for i in range(1, L + 1):
+        if i <= N:
+            list_starting_position.append(i)
+        else:
+            list_starting_position.append(0)
 
-    # print(third_starting_state)
+    list_reversed = []
 
-    first_tuple = list()
-    second_tuple = list()
-    third_tuple = list()
+    for i in range(0, L):
+        list_reversed.append(list_starting_position[L - 1 - i])
 
-    for item in first_starting_state:
-        if item != '':
-            first_tuple.append(int(item))
+    # print(list_reversed)
+    # print(list_starting_position)
 
-    for item in second_starting_state:
-        if item != '':
-            second_tuple.append(int(item))
+    problem = Disk(tuple(list_starting_position), tuple(list_reversed))
 
-    for item in third_starting_state:
-        if item != '':
-            third_tuple.append(int(item))
+    solution = astar_search(problem)
 
-    pass_starting_state = (tuple(first_tuple), tuple(second_tuple), tuple(third_tuple))
-
-    final_state_input = input()
-
-    starting_state = final_state_input.split(";")
-
-    first_starting_state = starting_state[0].split(',')
-    second_starting_state = starting_state[1].split(',')
-    third_starting_state = starting_state[2].split(',')
-
-    first_tuple = list()
-    second_tuple = list()
-    third_tuple = list()
-
-    for item in first_starting_state:
-        if item != '':
-            first_tuple.append(int(item))
-
-    for item in second_starting_state:
-        if item != '':
-            second_tuple.append(int(item))
-
-    for item in third_starting_state:
-        if item != '':
-            third_tuple.append(int(item))
-
-    pass_final_state = (tuple(first_tuple), tuple(second_tuple), tuple(third_tuple))
-
-    problem = hanoiProblem(pass_starting_state, pass_final_state)
-    solution = breadth_first_tree_search(problem)
-    print(solution)
+    # print(solution.solve())
+    print(solution.solution())
