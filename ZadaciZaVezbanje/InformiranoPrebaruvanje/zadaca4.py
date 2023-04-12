@@ -519,7 +519,10 @@ if __name__ == "__main__":
     N = int(input())
     L = int(input())
 
+    some_list = [1,2,3,4,5,6,7,8]
+
     list_starting_position = []
+
 
     for i in range(1, L + 1):
         if i <= N:
