@@ -1,5 +1,3 @@
-from sklearn.preprocessing import OrdinalEncoder
-from sklearn.naive_bayes import CategoricalNB
 from sklearn.naive_bayes import GaussianNB
 
 if __name__ == '__main__':
@@ -95,8 +93,9 @@ if __name__ == '__main__':
     # endregion
 
     # (0-85%) (85%) = train set
-    # (85-100%) (15%) = train set
+    # (85-100%) (15%) = test set
 
+    # region Transforming dataset from string to float values
     new_dataset = list()
     for row in dataset:
         new_row = list()
@@ -105,31 +104,46 @@ if __name__ == '__main__':
         new_dataset.append(new_row)
     dataset = new_dataset
 
+    #endregion
+
+    # region Splitting the dataset
+    # Splitting the dataset into two sections
+    # train_set and test_set
     train_set = dataset[0: int(0.85 * len(dataset))]
     test_set = dataset[int(0.85 * len(dataset)):]
+    # endregion
 
+    # region Separating CatAtt from ClassAtt
+    # --Separating the categorical attributes from the class attributes--
     X_train = [row[:-1] for row in train_set]
     Y_train = [row[-1] for row in train_set]
 
     X_test = [row[:-1] for row in test_set]
     Y_test = [row[-1] for row in test_set]
+    # ------------------------------------------------------------------
+    #endregion
 
-
+    # region Classificator and fitting
     classificator = GaussianNB()
     classificator.fit(X_train, Y_train)
+    # endregion
 
+    # region Calculation accuracy of the model
     accuracy = 0
     for row, actual_class in zip(X_test, Y_test):
         predicted_value = classificator.predict([row])
         if predicted_value == actual_class:
             accuracy += 1
-
     print(accuracy / len(X_test))
+    #endregion
 
+    # region Testing the model on random input and predicting the class
     input_value = [float(element) for element in input().split(' ')]
     the_prediction = classificator.predict([input_value])[0]
     print(int(the_prediction))
+    # endregion
 
-
+    # region Predicted probabilities for all the classes
     print(classificator.predict_proba([input_value]))
+    # endregion
 
