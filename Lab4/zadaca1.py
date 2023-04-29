@@ -1392,7 +1392,6 @@ if __name__ == '__main__':
     # endregion
 
     # region Description of the problem
-
     # Last column is class attribute
     # Train NBC which will predict
     # classes of solar shine and
@@ -1400,14 +1399,13 @@ if __name__ == '__main__':
     # 0-75% (75%) = train dataset
     # 75-100% (25%) = test dataset
 
-    # TODO: Calculate the accuracy for the rest 25%
-    # TODO: Make prediction of the input records
+    # DONE: Calculate the accuracy for the rest 25%
+    # DONE: Make prediction of the input records
 
-    # TODO: Input: One record
-    # TODO: Output: Accuracy of the model,
-    # TODO prediction class, the probabilities of class
-    # TODO belonging
-
+    # DONE: Input: One record
+    # DONE: Output: Accuracy of the model,
+    # DONE prediction class, the probabilities of class
+    # DONE belonging
     # endregion
 
     # region Encoding the categorical attributes
@@ -1415,7 +1413,7 @@ if __name__ == '__main__':
     encoder.fit([row[:-1] for row in dataset_copy])  # We are first fitting the dataset
     # endregion
 
-    # region separate Train and Test subset
+    # region Separate Train and Test subset
     # 0-75% (75%) = train dataset
     # 75-100% (25%) = test dataset
     train_set = dataset_copy[0: int(0.75 * len(dataset_copy))]
@@ -1423,7 +1421,6 @@ if __name__ == '__main__':
     # endregion
 
     # region Using the classificator
-
     # --Separating the categorical attributes from the class attribute--
     X_train = [col[:-1] for col in train_set]
     X_train = encoder.transform(X_train)  # Then we transform the dataset
@@ -1434,20 +1431,20 @@ if __name__ == '__main__':
     Y_test = [col[-1] for col in test_set]
     # ------------------------------------------------------------------
 
+    # Using the classificator and fitting
     classificator = CategoricalNB()
     classificator.fit(X_train, Y_train)
     # endregion
 
-    #region Accuracy
+    # region Accuracy
     accuracy = 0
     for row, real_class in zip(X_test, Y_test):
         predict = classificator.predict([row])
         if predict == real_class:
             accuracy += 1
 
-
     print(accuracy / len(test_set))
-    #endregion
+    # endregion
 
     # region Testing on input
     entry_attributes = [element for element in input().split(' ')]
@@ -1455,9 +1452,6 @@ if __name__ == '__main__':
     print(classificator.predict(entry_attributes)[0])
     # endregion
 
-    #region Probabilities
-
+    # region Probabilities of the classes
     print(classificator.predict_proba(entry_attributes))
-
-    #endregion
-
+    # endregion
