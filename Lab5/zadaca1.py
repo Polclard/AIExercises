@@ -1420,7 +1420,6 @@ if __name__ == '__main__':
     accuracy = accuracy_counter / len(test_set)
     print(f"Accuracy: {accuracy}")
 
-
     features_importance = list(classifier.feature_importances_)
 
     most_important_importance = features_importance.index(max(features_importance))
