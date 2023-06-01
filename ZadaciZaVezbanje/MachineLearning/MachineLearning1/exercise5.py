@@ -3,7 +3,6 @@ from sklearn.neural_network import MLPClassifier
 
 warnings.filterwarnings("ignore")
 
-# region Dataset
 data = [
     [0.02, 0.0371, 0.0428, 0.0207, 0.0954, 0.0986, 0.1539, 0.1601, 0.3109, 0.2111, 0.1609, 0.1582, 0.2238, 0.0645,
      0.066, 0],
@@ -421,7 +420,6 @@ data = [
      0.0673, 1],
     [0.026, 0.0363, 0.0136, 0.0272, 0.0214, 0.0338, 0.0655, 0.14, 0.1843, 0.2354, 0.272, 0.2442, 0.1665, 0.0336,
      0.1302, 1]]
-# endregion
 
 if __name__ == '__main__':
     # 15 characteristics and 2 classes
