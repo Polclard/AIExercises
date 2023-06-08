@@ -454,8 +454,8 @@ if __name__ == '__main__':
                 new_row.append(row[i])
         new_dataset.append(new_row)
 
-    test_set_2 = dataset[:X] # T
-    train_set_2 = dataset[X:] # T
+    test_set_2 = new_dataset[:X] # T
+    train_set_2 = new_dataset[X:] # T
 
     train_x_2 = [row[:-1] for row in train_set_2] # T
     train_y_2 = [row[-1] for row in train_set_2] # T
