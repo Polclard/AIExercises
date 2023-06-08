@@ -136,7 +136,7 @@ if __name__ == '__main__':
 
     accuracy_counter_train = 0
     for item, real_class in zip(train_x, train_y):
-        predicted_class = classifier.predict(min_max_scaler.transform([item]))
+        predicted_class = classifier.predict(min_max_scaler.transform([item]))[0]
         if predicted_class == real_class:
             accuracy_counter_train += 1
 
@@ -144,15 +144,48 @@ if __name__ == '__main__':
 
     accuracy_counter_validation = 0
     for item, real_class in zip(validation_x, validation_y):
-        predicted_class = classifier.predict(min_max_scaler.transform([item]))
+        predicted_class = classifier.predict(min_max_scaler.transform([item]))[0]
         if predicted_class == real_class:
             accuracy_counter_validation += 1
 
     accuracy_validation = float(accuracy_counter_validation) / len(validation_set)
 
     if accuracy_train > 0.15 * accuracy_validation + accuracy_validation:
+
+        new_dataset = []
+        for row in dataset:
+            new_row = []
+            for i in range(len(row)):
+                if i != delete_index:
+                    new_row.append(row[i])
+            new_dataset.append(new_row)
+
+        train_set_new = new_dataset[:int(len(new_dataset) * 0.8)]
+        validation_set_new = new_dataset[int(len(new_dataset) * 0.8):]
+
+        train_x_new = [row[:-1] for row in train_set_new]
+        train_y_new = [row[-1] for row in train_set_new]
+
+        validation_x_new = [row[:-1] for row in validation_set_new]
+        validation_y_new = [row[-1] for row in validation_set_new]
+
+        min_max_scaler_new = MinMaxScaler(feature_range=(-1, 1))
+        min_max_scaler_new.fit(train_x_new)
+
+        classifier_new = MLPClassifier(hidden_layer_sizes=number_of_neurons,
+                                   max_iter=20,
+                                   activation="relu",
+                                   learning_rate_init=learning_rate,
+                                   random_state=0)
+        classifier_new.fit(min_max_scaler_new.transform(train_x_new), train_y_new)
+
+        new_specimen = []
+        for i in range(len(specimen)):
+            if i != delete_index:
+                new_specimen.append(specimen[i])
+
         print("Se sluchuva overfitting")
-        print("1")
+        print(f"{classifier_new.predict(min_max_scaler_new.transform([new_specimen]))[0]}")
     else:
         print("Ne se sluchuva overfitting")
         print("0")
